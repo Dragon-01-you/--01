@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>方案比较分析报告 - 完整版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    
+    <!-- 内联数据区 -->
+    <script>
+        // 样例数据（前10条）
+        const sampleData = [
+            {
+                "方案名称": "传统专注工具（番茄钟、白噪音机，如小米白噪音机）",
+                "优点": "操作简单，价格低廉（50-200 元）；便携性强，可随身携带；能耗低，续航达 100 小时以上",
+                "不足": "功能单一：仅能提供时间管理或白噪音，无生理状态适配，浮躁时效果下降 50%；无场景化奖励：缺乏 \"专注后放松\" 的闭环，用户难以长期坚持；体验单一：仅依赖听觉或视觉，无触觉、嗅觉等多感官联动",
+                "适用场景": "学生、职场人的基础专注需求（如短期作业、简单办公），对沉浸感与疗愈效果无要求，预算极低（<200 元）"
+            },
+            {
+                "方案名称": "高端 VR 旅行套件（如 Horizon Walker VR）",
+                "优点": "沉浸感强：支持 360° 全景视觉 + 触觉反馈，场景代入感强；场景丰富：内置 500 + 全球景点，覆盖热门目的地；交互性好：支持手势控制，可与虚拟场景互动",
+                "不足": "成本极高：单套价格 3999 美元，搭配高性能电脑需额外花费 1 万元以上；兼容性差：仅支持高端 VR 头显，中低端设备无法适配；无专注功能：仅聚焦旅行体验，无法与学习场景联动，功能碎片化",
+                "适用场景": "高收入群体（月收入≥3 万元）、VR 爱好者的纯旅行体验需求，无学习或专注需求，预算充足"
+            },
+            {
+                "方案名称": "单一疗愈机器人（如日本 PARO 海豹机器人）",
+                "优点": "触感柔软：采用医用级硅胶，触感接近真实动物，亲肤度高；疗愈效果好：通过声纹、触感交互，可降低焦虑情绪发生率 30%；安全性高：无尖锐部件，适合老人、儿童使用",
+                "不足": "功能局限：仅聚焦情绪安抚，无学习、旅行功能；价格昂贵：单台售价约 3000 美元，大众用户难以负担；交互单一：仅支持基础声纹、触感反馈，无多感官联动",
+                "适用场景": "老年人、情绪焦虑人群（如抑郁症患者）的纯疗愈需求，对学习、旅行功能无要求，预算充足"
+            },
+            {
+                "方案名称": "手机 AR 旅行 APP（如华为智慧文旅 AR）",
+                "优点": "价格低廉：免费或低付费（会员费 < 50 元 / 年）；易获取：手机应用商店可直接下载，无需额外硬件；功能多样：集成 AR 导览、景点讲解、旅行规划等多模块",
+                "不足": "沉浸感不足：仅依赖视觉体验，无触觉、嗅觉反馈，体验分离；无专注联动：与学习场景无直接关联，无法形成 \"专注-放松\" 闭环；依赖设备：需智能手机支持，老年用户学习成本高",
+                "适用场景": "学生、年轻旅行者的轻量级旅行需求，预算有限（<100 元），追求便携性与多功能性"
+            }
+        ];
+
+        // 综合评分数据
+        const ratingsData = [
+            {"name": "传统专注工具", "score": 3.4, "price_score": 4.8, "functionality_score": 2.5, "portability_score": 4.7, "experience_score": 2.8},
+            {"name": "高端 VR 旅行套件", "score": 3.7, "price_score": 1.0, "functionality_score": 4.8, "portability_score": 1.5, "experience_score": 4.8},
+            {"name": "单一疗愈机器人", "score": 3.2, "price_score": 1.2, "functionality_score": 3.0, "portability_score": 2.0, "experience_score": 4.5},
+            {"name": "手机 AR 旅行 APP", "score": 4.0, "price_score": 4.9, "functionality_score": 4.2, "portability_score": 4.8, "experience_score": 3.8}
+        ];
+
+        // 价格区间数据（统一换算为人民币，1美元≈7.3元）
+        const priceData = [
+            {"name": "传统专注工具", "min_price": 50, "max_price": 200, "avg_price": 125, "currency": "CNY"},
+            {"name": "高端 VR 旅行套件", "min_price": 29193, "max_price": 29193, "avg_price": 29193, "currency": "CNY"},
+            {"name": "单一疗愈机器人", "min_price": 21900, "max_price": 21900, "avg_price": 21900, "currency": "CNY"},
+            {"name": "手机 AR 旅行 APP", "min_price": 0, "max_price": 50, "avg_price": 25, "currency": "CNY"}
+        ];
+
+        // 适用人群覆盖数据
+        const userCoverageData = [
+            {"name": "传统专注工具", "学生": 0.9, "职场人士": 0.8, "老年人": 0.4, "儿童": 0.3, "旅行者": 0.5},
+            {"name": "高端 VR 旅行套件", "学生": 0.7, "职场人士": 0.8, "老年人": 0.3, "儿童": 0.6, "旅行者": 0.9},
+            {"name": "单一疗愈机器人", "学生": 0.4, "职场人士": 0.5, "老年人": 0.9, "儿童": 0.7, "旅行者": 0.2},
+            {"name": "手机 AR 旅行 APP", "学生": 0.8, "职场人士": 0.7, "老年人": 0.5, "儿童": 0.6, "旅行者": 0.9}
+        ];
+    </script>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+    <!-- 页面头部 -->
+    <header class="bg-white shadow-lg border-b border-blue-100">
+        <div class="max-w-7xl mx-auto px-6 py-8">
+            <div class="text-center">
+                <h1 class="text-4xl font-bold text-gray-800 mb-2">
+                    <i class="fas fa-chart-line text-blue-600 mr-3"></i>
+                    方案比较分析报告
+                </h1>
+                <p class="text-lg text-gray-600">全面评估四大产品方案的综合表现与适用场景</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-8 space-y-12">
+        <!-- 样例数据表格 -->
+        <section class="bg-white rounded-2xl shadow-xl p-8 border border-blue-100">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <i class="fas fa-table text-green-600 mr-3"></i>
+                方案基础信息
+            </h2>
+            <div class="overflow-x-auto">
+                <table class="w-full table-auto">
+                    <thead>
+                        <tr class="bg-gradient-to-r from-blue-50 to-indigo-50">
+                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">方案名称</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">主要优点</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">主要不足</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">适用场景</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sampleDataTable" class="divide-y divide-gray-200">
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 可视化图表区域 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- 综合评分对比 -->
+            <section class="bg-white rounded-2xl shadow-xl p-8 border border-blue-100">
+                <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-star text-yellow-500 mr-3"></i>
+                    综合评分对比
+                </h3>
+                <div class="h-80">
+                    <canvas id="ratingsChart"></canvas>
+                </div>
+            </section>
+
+            <!-- 价格区间对比 -->
+            <section class="bg-white rounded-2xl shadow-xl p-8 border border-blue-100">
+                <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-dollar-sign text-green-600 mr-3"></i>
+                    价格区间对比（CNY）
+                </h3>
+                <div class="h-80">
+                    <canvas id="priceChart"></canvas>
+                </div>
+            </section>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- 功能维度雷达图 -->
+            <section class="bg-white rounded-2xl shadow-xl p-8 border border-blue-100">
+                <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-radar-chart text-purple-600 mr-3"></i>
+                    功能维度雷达图对比
+                </h3>
+                <div class="h-80">
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </section>
+
+            <!-- 适用人群覆盖分析 -->
+            <section class="bg-white rounded-2xl shadow-xl p-8 border border-blue-100">
+                <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-users text-orange-600 mr-3"></i>
+                    适用人群覆盖分析
+                </h3>
+                <div class="h-80">
+                    <canvas id="userCoverageChart"></canvas>
+                </div>
+            </section>
+        </div>
+
+        <!-- 数据分析总结 -->
+        <section class="bg-white rounded-2xl shadow-xl p-8 border border-blue-100">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <i class="fas fa-lightbulb text-yellow-500 mr-3"></i>
+                深度分析总结
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">核心发现</h3>
+                    <ul class="space-y-3 text-gray-600">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                            <span><strong>手机 AR 旅行 APP</strong>综合表现最佳（4.0分），价格亲民且功能多样</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                            <span><strong>传统专注工具</strong>性价比突出（3.4分），适合预算有限的基础需求</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-exclamation-triangle text-yellow-500 mr-2 mt-1"></i>
+                            <span><strong>高端 VR 套件</strong>和<strong>疗愈机器人</strong>价格昂贵，功能单一但专业度高</span>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">用户建议</h3>
+                    <ul class="space-y-3 text-gray-600">
+                        <li class="flex items-start">
+                            <i class="fas fa-arrow-right text-blue-500 mr-2 mt-1"></i>
+                            <span>预算有限用户：优先选择<strong>手机 AR APP</strong>或<strong>传统专注工具</strong></span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-arrow-right text-blue-500 mr-2 mt-1"></i>
+                            <span>专业需求用户：根据特定场景选择<strong>VR 套件</strong>或<strong>疗愈机器人</strong></span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-arrow-right text-blue-500 mr-2 mt-1"></i>
+                            <span>综合需求用户：<strong>手机 AR APP</strong>提供最佳的性价比和功能平衡</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-white border-t border-gray-200 mt-16">
+        <div class="max-w-7xl mx-auto px-6 py-8 text-center">
+            <p class="text-gray-600">© 2024 方案比较分析报告 | 数据驱动决策</p>
+        </div>
+    </footer>
+
+    <script>
+        // 填充样例数据表格
+        function populateSampleTable() {
+            const tableBody = document.getElementById('sampleDataTable');
+            sampleData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.className = index % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100';
+                
+                const name = item['方案名称'].split('（')[0];
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900">${name}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600 max-w-xs truncate" title="${item['优点']}">${item['优点']}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600 max-w-xs truncate" title="${item['不足']}">${item['不足']}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600 max-w-xs truncate" title="${item['适用场景']}">${item['适用场景']}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // 创建综合评分对比图
+        function createRatingsChart() {
+            const ctx = document.getElementById('ratingsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ratingsData.map(item => item.name.split('（')[0]),
+                    datasets: [{
+                        label: '综合评分',
+                        data: ratingsData.map(item => item.score),
+                        backgroundColor: [
+                            'rgba(34, 197, 94, 0.8)',
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(239, 68, 68, 0.8)',
+                            'rgba(168, 85, 247, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(34, 197, 94, 1)',
+                            'rgba(59, 130, 246, 1)',
+                            'rgba(239, 68, 68, 1)',
+                            'rgba(168, 85, 247, 1)'
+                        ],
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 5,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 创建价格区间对比图
+        function createPriceChart() {
+            const ctx = document.getElementById('priceChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: priceData.map(item => item.name.split('（')[0]),
+                    datasets: [{
+                        label: '平均价格 (CNY)',
+                        data: priceData.map(item => item.avg_price),
+                        backgroundColor: [
+                            'rgba(34, 197, 94, 0.8)',
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(239, 68, 68, 0.8)',
+                            'rgba(168, 85, 247, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(34, 197, 94, 1)',
+                            'rgba(59, 130, 246, 1)',
+                            'rgba(239, 68, 68, 1)',
+                            'rgba(168, 85, 247, 1)'
+                        ],
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '¥' + value.toLocaleString();
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 创建功能维度雷达图
+        function createRadarChart() {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            const names = ratingsData.map(item => item.name.split('（')[0]);
+            
+            const datasets = ratingsData.map((item, index) => ({
+                label: names[index],
+                data: [
+                    item.price_score,
+                    item.functionality_score,
+                    item.portability_score,
+                    item.experience_score
+                ],
+                backgroundColor: [
+                    'rgba(34, 197, 94, 0.2)',
+                    'rgba(59, 130, 246, 0.2)',
+                    'rgba(239, 68, 68, 0.2)',
+                    'rgba(168, 85, 247, 0.2)'
+                ][index],
+                borderColor: [
+                    'rgba(34, 197, 94, 1)',
+                    'rgba(59, 130, 246, 1)',
+                    'rgba(239, 68, 68, 1)',
+                    'rgba(168, 85, 247, 1)'
+                ][index],
+                borderWidth: 2,
+                pointBackgroundColor: [
+                    'rgba(34, 197, 94, 1)',
+                    'rgba(59, 130, 246, 1)',
+                    'rgba(239, 68, 68, 1)',
+                    'rgba(168, 85, 247, 1)'
+                ][index],
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 6
+            }));
+
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['价格合理性', '功能多样性', '便携性', '用户体验'],
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 5,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            angleLines: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 创建适用人群覆盖分析图
+        function createUserCoverageChart() {
+            const ctx = document.getElementById('userCoverageChart').getContext('2d');
+            const userTypes = ['学生', '职场人士', '老年人', '儿童', '旅行者'];
+            const names = userCoverageData.map(item => item.name.split('（')[0]);
+            
+            const datasets = userTypes.map((userType, index) => ({
+                label: userType,
+                data: userCoverageData.map(item => item[userType]),
+                backgroundColor: [
+                    'rgba(34, 197, 94, 0.8)',
+                    'rgba(59, 130, 246, 0.8)',
+                    'rgba(239, 68, 68, 0.8)',
+                    'rgba(168, 85, 247, 0.8)',
+                    'rgba(245, 158, 11, 0.8)'
+                ][index],
+                borderColor: [
+                    'rgba(34, 197, 94, 1)',
+                    'rgba(59, 130, 246, 1)',
+                    'rgba(239, 68, 68, 1)',
+                    'rgba(168, 85, 247, 1)',
+                    'rgba(245, 158, 11, 1)'
+                ][index],
+                borderWidth: 2,
+                borderRadius: 4
+            }));
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: names,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            stacked: true,
+                            beginAtZero: true,
+                            max: 1,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return (value * 100) + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            populateSampleTable();
+            createRatingsChart();
+            createPriceChart();
+            createRadarChart();
+            createUserCoverageChart();
+        });
+    </script>
+</body>
+</html>
